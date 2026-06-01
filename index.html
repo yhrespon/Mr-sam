@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mr SAM Originel • MiniBot and Spam or Ban </title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'JetBrains Mono', monospace; transition: all 0.3s ease; }
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg,#0b0b0d,#1a1a1f);
+    color: #e5e7eb;
+    overflow: auto;
+    padding: 20px;
+  }
+  .card {
+    background: rgba(20,20,23,0.95);
+    border-radius: 25px;
+    padding: 35px 25px;
+    width: 380px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+    border: 1px solid rgba(139,92,246,0.2);
+    animation: floatCard 4s ease-in-out infinite;
+  }
+  @keyframes floatCard {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  .avatar {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    border: 3px solid #8b5cf6;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(139,92,246,0.4);
+    transition: transform 0.3s ease;
+  }
+  .avatar:hover { transform: scale(1.1) rotate(5deg); }
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  h1 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #8b5cf6;
+    letter-spacing: 1px;
+  }
+  input[type="tel"], textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(139,92,246,0.3);
+    background: rgba(255,255,255,0.05);
+    color: #e5e7eb;
+    font-size: 14px;
+    outline: none;
+    transition: 0.3s;
+    font-family: monospace;
+  }
+  input[type="tel"]:focus, textarea:focus {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 10px rgba(139,92,246,0.4);
+  }
+  .btn {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 12px 25px;
+    background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 5px 15px rgba(139,92,246,0.4);
+    transition: all 0.3s ease;
+  }
+  .btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(139,92,246,0.6);
+  }
+  #pairResult, #sendResult {
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: 14px;
+    display: none;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    animation: fadeIn 0.5s ease forwards;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  #copyBtn {
+    display: none;
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    background: #34d399;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(52,211,153,0.4);
+    transition: all 0.3s ease;
+  }
+  #copyBtn:hover {
+    background: #10b981;
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(52,211,153,0.6);
+  }
+  .separator {
+    margin: 25px 0 15px;
+    border-top: 1px solid #2d2d30;
+  }
+  .footer {
+    margin-top: 20px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+  }
+  label {
+    font-size: 12px;
+    display: block;
+    text-align: left;
+    margin-bottom: 5px;
+    color: #a0a0b0;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="avatar">
+    <img src="https://files.catbox.moe/yyh8zl.jpeg" alt="Avatar Mr SAM Originel">
+  </div>
+  <h1>Mr SAM Originel</h1>
+
+  <!-- SECTION PAIRE -->
+  <input id="phonePair" type="tel" placeholder="2376XXXXXXX">
+  <button id="pairBtn" class="btn">🔗 Générer le code</button>
+  <div id="pairResult"></div>
+  <button id="copyBtn">📋 Copier le code</button>
+
+  <div class="separator"></div>
+
+  <!-- SECTION ENVOI MULTIMEDIA -->
+  <label>📤 Envoyer l’image + sticker à (un numéro par ligne)</label>
+  <textarea id="targetNumbers" rows="3" placeholder="2376XXXXXXX&#10;2376YYYYYYY"></textarea>
+  <button id="sendMediaBtn" class="btn" style="background:#10b981;">📨 Envoyer maintenant</button>
+  <div id="sendResult"></div>
+
+  <div class="footer">Powered by Samy</div>
+</div>
+
+<script>
+// Gestion du pairage
+const pairBtn = document.getElementById("pairBtn");
+const pairResult = document.getElementById("pairResult");
+const copyBtn = document.getElementById("copyBtn");
+
+pairBtn.onclick = async () => {
+  const phone = document.getElementById("phonePair").value.trim();
+  if(!phone) { 
+    pairResult.style.display='block';
+    pairResult.style.background='rgba(239,68,68,0.1)';
+    pairResult.style.border='1px solid #ef4444';
+    pairResult.style.color='#ef4444';
+    pairResult.textContent = 'Numéro requis';
+    copyBtn.style.display='none';
+    return;
+  }
+
+  pairResult.style.display='block';
+  pairResult.style.background='rgba(139,92,246,0.15)';
+  pairResult.style.border='1px solid #8b5cf6';
+  pairResult.style.color='#8b5cf6';
+  pairResult.textContent = 'Génération en cours...';
+  copyBtn.style.display='none';
+
+  try {
+    const res = await fetch(`/pair-api/code?number=${encodeURIComponent(phone)}`);
+    const data = await res.json();
+    if(data.code){
+      pairResult.style.background='rgba(52,211,153,0.1)';
+      pairResult.style.border='1px solid #34d399';
+      pairResult.style.color='#34d399';
+      pairResult.innerHTML = `Code généré : <b>${data.code}</b>`;
+      copyBtn.style.display='inline-block';
+    } else {
+      pairResult.style.background='rgba(239,68,68,0.1)';
+      pairResult.style.border='1px solid #ef4444';
+      pairResult.style.color='#ef4444';
+      pairResult.textContent = `Erreur: ${data.error || 'Serveur'}`;
+      copyBtn.style.display='none';
+    }
+  } catch(e){
+    pairResult.style.background='rgba(239,68,68,0.1)';
+    pairResult.style.border='1px solid #ef4444';
+    pairResult.style.color='#ef4444';
+    pairResult.textContent = 'Erreur serveur';
+    copyBtn.style.display='none';
+  }
+};
+
+copyBtn.onclick = () => {
+  const codeElem = pairResult.querySelector("b");
+  if(!codeElem) return;
+  const code = codeElem.textContent;
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(code).then(() => {
+      copyBtn.textContent = 'Copié !';
+      copyBtn.style.background = '#22c55e';
+      setTimeout(() => {
+        copyBtn.textContent = 'Copier le code';
+        copyBtn.style.background = '#34d399';
+      }, 2000);
+    }).catch(() => fallbackCopy(code));
+  } else {
+    fallbackCopy(code);
+  }
+};
+
+function fallbackCopy(text){
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand('copy');
+    copyBtn.textContent = 'Copié !';
+    copyBtn.style.background = '#22c55e';
+    setTimeout(() => {
+      copyBtn.textContent = 'Copier le code';
+      copyBtn.style.background = '#34d399';
+    }, 2000);
+  } catch (err) {
+    alert('Impossible de copier');
+  }
+  document.body.removeChild(textarea);
+}
+
+// Gestion envoi media
+const sendMediaBtn = document.getElementById("sendMediaBtn");
+const targetNumbers = document.getElementById("targetNumbers");
+const sendResult = document.getElementById("sendResult");
+
+sendMediaBtn.onclick = async () => {
+  const raw = targetNumbers.value.trim();
+  if (!raw) {
+    sendResult.style.display = 'block';
+    sendResult.style.background = 'rgba(239,68,68,0.1)';
+    sendResult.style.border = '1px solid #ef4444';
+    sendResult.style.color = '#ef4444';
+    sendResult.innerText = "Entrez au moins un numéro";
+    return;
+  }
+  const numbers = raw.split(/\n|,| /).filter(n => n.trim().length > 0);
+  sendResult.style.display = 'block';
+  sendResult.style.background = 'rgba(139,92,246,0.15)';
+  sendResult.style.border = '1px solid #8b5cf6';
+  sendResult.style.color = '#8b5cf6';
+  sendResult.innerText = "⏳ Envoi en cours...";
+
+  try {
+    const res = await fetch("/api/send-media", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ numbers })
+    });
+    const data = await res.json();
+    if (data.success) {
+      sendResult.style.background = 'rgba(52,211,153,0.1)';
+      sendResult.style.border = '1px solid #34d399';
+      sendResult.style.color = '#34d399';
+      sendResult.innerText = `✅ Envoyé à ${data.sentTo.length} destinataire(s)`;
+    } else {
+      sendResult.style.background = 'rgba(239,68,68,0.1)';
+      sendResult.style.border = '1px solid #ef4444';
+      sendResult.style.color = '#ef4444';
+      sendResult.innerText = `❌ Erreur : ${data.error}`;
+    }
+  } catch (err) {
+    sendResult.style.background = 'rgba(239,68,68,0.1)';
+    sendResult.style.border = '1px solid #ef4444';
+    sendResult.style.color = '#ef4444';
+    sendResult.innerText = "❌ Erreur réseau";
+  }
+};
+</script>
+</body>
+</html>
