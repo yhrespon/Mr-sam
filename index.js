@@ -19,7 +19,7 @@ import {
 
 // ======================= EXPRESS =======================
 const app = express();
-const PORT = process.env.PORT ||80;   // 👈 Utilise le port dynamique
+const PORT = process.env.PORT || 10028;   // 👈 Utilise le port dynamique
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
