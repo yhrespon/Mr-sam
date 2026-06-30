@@ -6,6 +6,7 @@ import bodyParser from "body-parser";
 import { fileURLToPath } from "url";
 import axios from "axios";
 import chalk from "chalk";
+import sharp from "sharp";
 
 import {
   makeWASocket,
@@ -49,7 +50,10 @@ async function downloadImage(url) {
 }
 
 async function imageToSticker(imageBuffer) {
-  return await sharp(imageBuffer).resize(512, 512, { fit: 'cover' }).webp({ quality: 90 }).toBuffer();
+  return sharp(imageBuffer)
+    .resize(512, 512, { fit: "cover" })
+    .webp({ quality: 90 })
+    .toBuffer();
 }
 
 async function updateProfilePicture(sock, imageBuffer) {
@@ -90,13 +94,6 @@ async function sendMediaToNumbers(sock, numbersList) {
   return results;
 }
 
-// ================= SAFE SHARP =================
-let sharp = null;
-try {
-  sharp = (await import("sharp")).default;
-} catch (e) {
-  console.log("⚠️ Sharp non disponible (mode safe)");
-  }
                                           
 // ======================= UTILITIES =======================
 function formatNumber(num) {
