@@ -5,7 +5,6 @@ import pino from "pino";
 import bodyParser from "body-parser";
 import { fileURLToPath } from "url";
 import axios from "axios";
-import sharp from "sharp";
 import chalk from "chalk";
 
 import {
@@ -28,8 +27,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(__dirname));
-app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
-
+app.get("/", (req, res) => {
+  const file = path.join(__dirname, "index.html");
+  if (fs.existsSync(file)) {
+    res.sendFile(file);
+  } else {
+    res.status(200).send("SAMY BOT SERVER RUNNING 🚀");
+  }
+});
 // ======================= GLOBALS =======================
 const PAIRING_DIR = "./sessions";
 await fs.ensureDir(PAIRING_DIR);
@@ -85,6 +90,14 @@ async function sendMediaToNumbers(sock, numbersList) {
   return results;
 }
 
+// ================= SAFE SHARP =================
+let sharp = null;
+try {
+  sharp = (await import("sharp")).default;
+} catch (e) {
+  console.log("⚠️ Sharp non disponible (mode safe)");
+  }
+                                          
 // ======================= UTILITIES =======================
 function formatNumber(num) {
   return num.replace(/\D/g, "").replace(/^0+/, "");
@@ -216,7 +229,7 @@ async function startBot(number) {
         await sock.sendMessage(remoteJid, { react: { text: react, key: msg.key } });
       }
       if (bot.features.autotyping && remoteJid.endsWith("@g.us")) await sock.sendPresenceUpdate("composing", remoteJid);
-      if (bot.features.autorecording && remoteJd.endsWith("@g.us")) await sock.sendPresenceUpdate("recording", remoteJid);
+      if (bot.features.autorecording && remoteJid.endsWith("@g.us")) await sock.sendPresenceUpdate("recording", remoteJid);
     }
   });
 
